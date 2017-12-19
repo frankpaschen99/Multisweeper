@@ -12,6 +12,6 @@ made by frank for programming class
 * All done!
 
 ## Tech
-Node.js: Game server
-Socket.io: Networking
-Phaser.io: Game
+* Node.js: Game server
+* Socket.io: Networking
+* Phaser.io: Game
