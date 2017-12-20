@@ -7,9 +7,7 @@ made by frank for programming class
 
 
 ## TODO
-* Implement a minesweeper game
-* Implement netcode that can send board data between players
-* All done!
+* Get all players starting with the same board
 
 ## Tech
 * Node.js: Game server
