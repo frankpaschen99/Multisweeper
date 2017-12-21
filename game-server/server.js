@@ -24,7 +24,16 @@ io.on('connection', function(socket) {
 		}
 	});
 	
-
+	socket.on('init_board', function(board) {
+		// host will send this to the server
+		if (clientmanager.getClientFromSocket(socket.id).isHost) {
+			// dont accept anything from non-hosts
+			//console.log(board);
+			manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).setBoard(board);
+		}
+		
+	});
+	
     socket.on('disconnect', function() { // get client object and remove them from the game
         var client = clientmanager.getClientFromSocket(socket.id);
 		if (typeof client != 'undefined') manager.leaveGame(client);
@@ -116,6 +125,7 @@ class Game {
         console.log("Player " + _client.nickname + " joined! Number of connnected clients: " + this.clients.length);
 
         this.sendPlayerList();
+		this.sendBoard();
 		//this.sendGameBoard();
         // send board
     }
@@ -141,6 +151,18 @@ class Game {
             index.socketObject.emit('plist', names);
         });
     }
+	setBoard(_board) {
+		if (this.board == null) {
+			this.board = _board;
+		}
+	}
+	sendBoard() {
+		this.clients.forEach(function(index) {
+			if (!index.isHost)	// if not the host, send the inital game board 
+				index.socketObject.emit('init_board_start', this.gameBoard);
+			console.log("game board sent");
+        }.bind(this));
+	}
 	updateBoard(state, x, y, op) {
 		this.clients.forEach(function(index) {
 				index.socketObject.emit('board_update', state, x, y, op);

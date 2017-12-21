@@ -26,6 +26,44 @@ var Board = function (columns, rows, mines) {
         
         setMines();
 		
+		/* Sent original board to server for other clients to download */		
+		var initBoard = [];
+		
+		for (var y = 0; y < rows; y++) {
+			
+			var row = [];
+			
+			for (var x = 0; x < columns; x++) {
+				var data = [];
+				data.push(board[y][x].getX());
+				data.push(board[y][x].getY());
+				data.push(board[y][x].getState());
+				row.push(data);
+			}
+			initBoard.push(row);
+		}
+		socket.emit("init_board", initBoard);
+		/* FIX ALL OF THIS OH MY GOD */
+		socket.on('init_board_start', function(data) {
+			board = null;
+			console.log("init board start called");
+			
+			for (var y = 0; y < rows; y++) {
+				var row = [];			
+				for (var x = 0; x < columns; x++) {
+
+					var tile = new Tile(x, y, group);
+					tile.setX(data[y][x].getX());
+					tile.setY(data[y][x].getY());
+					tile.setState(data[y][x].getState())
+					
+					tile.onRevealed.add(onReveal, this);
+					tile.onFlag.add(onFlag, this);
+					row.push(tile);
+				}
+				board.push(row);
+		}
+		});
 		/* Board data sent from server, update board on client */
 		socket.on('board_update', function(state, x, y, op) {
 			console.log("Recieved data back! " + state + ", " + x + "," + y);

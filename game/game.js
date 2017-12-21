@@ -1,14 +1,14 @@
 var gameProperties = {
-    screenWidth: 32 * 30,
-    screenHeight: 32 * 16,
+    screenWidth: 32 * 32,
+    screenHeight: 32 * 24,
     
     tileWidth: 32,
     tileHeight: 32,
     
-    boardWidth: 30,
-    boardHeight: 16,
+    boardWidth: 32,
+    boardHeight: 24,
     
-    totalMines: 10,
+    totalMines: 148,
 };
 
 var states = {
@@ -107,6 +107,3 @@ gameState.prototype = {
 
 var game = new Phaser.Game(gameProperties.screenWidth, gameProperties.screenHeight, Phaser.AUTO, 'gameDiv');
 game.state.add(states.game, gameState);
-game.state.start(states.game);
-
-console.log(gameState.board);

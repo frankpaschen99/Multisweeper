@@ -25,6 +25,7 @@
 		socket.emit("join_game", lobbyCode, document.getElementById('username').value);
 		document.getElementById("start").innerHTML = "";
 		document.getElementById("lobbyID").innerHTML = lobbyCode;
+		game.state.start(states.game);
 	}
 
 </script>
@@ -43,18 +44,22 @@
 	<div id="start">
 	<h1>Welcome to Multisweepercraft V1.0 by Frank!!!!111</h1>
 	<h3>To play, enter your username & lobby code (optional). Then click Join Game.</h3>
-	
+
 	<input text="text" id="username" placeholder="Username">
 	<input type="text" id="lobbyCode" placeholder="Lobby ID (Optional)">
 	<button type="button" onclick="joinGame() ">Join Game</button>
-	
+	<img src="img/grass.png" />
+	<img src="img/grass.png" />
+	<img src="img/grass.png" />
+	<img src="img/grass.png" />
+	<img src="img/grass.png" />
 	<script>
 	function mcBlocks() {
 		setInterval(function(){
 			document.getElementById("start").appendChild(new Image()).src = "img/grass.png";
 		}, 10000);
 	}
-	mcBlocks();
+	//mcBlocks();
 	</script>
 	<br><br>
 	<hr><hr><hr>
