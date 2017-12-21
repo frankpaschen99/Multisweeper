@@ -8,7 +8,7 @@
 	function sendBoardData(data, op) {	
 		// called when tile is clicked or flagged. Send this data to server.
 		
-		socket.emit("adadadada", data.getState(), data.getX(), data.getY(), op);
+		socket.emit("bdata", data.getState(), data.getX(), data.getY(), op);
 	}
 	
 	

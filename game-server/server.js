@@ -12,18 +12,22 @@ io.on('connection', function(socket) {
 		}
     });
 	
-	socket.on('adadadada', function(state, x, y, op) {
+	socket.on('bdata', function(state, x, y, op) {
 		// send data to all clients
 		console.log(state + ", " + x + ", " + y);
-		//if (!clientmanager.getClientFromSocket(socket.id) == null) 
+		
+		/* just handle cases when user clicks on the board before having their client object created */
+		try {
 			manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).updateBoard(state, x, y, op);
+		} catch (e) {
+			console.log("Don't click the board please.");
+		}
 	});
 	
 
     socket.on('disconnect', function() { // get client object and remove them from the game
         var client = clientmanager.getClientFromSocket(socket.id);
 		if (typeof client != 'undefined') manager.leaveGame(client);
-		
 		console.log("Socket disconnected: " + socket.id);
     });
 });

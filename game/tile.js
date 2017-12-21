@@ -54,7 +54,6 @@ var Tile = function (column, row, group) {
     var leftClick = function (sprite, pointer) {
 		if (pointer.leftButton.isDown && !pointer.rightButton.isDown) {
 			if (currentState == tile.states.DEFAULT) {
-				tile.reveal();
 				sendBoardData(tile, 1);
 			}
 		}
@@ -62,7 +61,6 @@ var Tile = function (column, row, group) {
 	// flag tile
 	var rightClick = function (sprite, pointer) {
 		if (pointer.rightButton.isDown && !pointer.leftButton.isDown) {
-			tile.flag();
 			sendBoardData(tile, -1);
 		}
     };

@@ -93,7 +93,6 @@ gameState.prototype = {
     },
     
     endGame: function () {
-		console.log("endgame called");
         this.tf_replay.visible = true;
     },
     

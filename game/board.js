@@ -26,15 +26,13 @@ var Board = function (columns, rows, mines) {
         
         setMines();
 		
+		/* Board data sent from server, update board on client */
 		socket.on('board_update', function(state, x, y, op) {
-			// recieved from the server, update on client
 			console.log("Recieved data back! " + state + ", " + x + "," + y);
-			
-		if (op == -1) {
-			board[y/32][x/32].flag();
-		}
-		else if (op == 1)
-			board[y/32][x/32].reveal();
+			if (op == -1)
+				board[y/32][x/32].flag();
+			else if (op == 1)
+				board[y/32][x/32].reveal();
 		});
     };
     this.getBoard = function() {
