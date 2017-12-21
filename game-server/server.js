@@ -5,30 +5,28 @@ const fs = require('fs');
 io.on('connection', function(socket) {
     console.log("Socket connected " + socket.id);
     socket.on('join_game', function(id, nickname) { // receive lobbyid and user's nickname
-			if (nickname == "" || nickname == " ") {
-				manager.createGameOrJoin(socket, "Unnamed Player", id);
-			} else {
-				manager.createGameOrJoin(socket, nickname, id);
-			}
-			
-			// game system handles sending the board data
+		if (nickname == "" || nickname == " ") {
+			manager.createGameOrJoin(socket, "Unnamed Player", id);
+		} else {
+			manager.createGameOrJoin(socket, nickname, id);
+		}
     });
+	
+	socket.on('adadadada', function(state, x, y, op) {
+		// send data to all clients
+		console.log(state + ", " + x + ", " + y);
+		//if (!clientmanager.getClientFromSocket(socket.id) == null) 
+			manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).updateBoard(state, x, y, op);
+	});
+	
 
     socket.on('disconnect', function() { // get client object and remove them from the game
         var client = clientmanager.getClientFromSocket(socket.id);
 		if (typeof client != 'undefined') manager.leaveGame(client);
+		
+		console.log("Socket disconnected: " + socket.id);
     });
 });
-
-// class controls the generation and updating of the game board, every time it is updated, sendGameBoard() will be called for all users
-class GameBoard {
-	constructor() {
-		this.mines = 99;
-		this.width = 30;
-		this.height = 16;
-	}
-	
-}
 
 class GameManager {
     constructor() {
@@ -54,9 +52,6 @@ class GameManager {
         var game = this.getGameFromID(client.gameid);
         game.leaveGame(client);
     }
-    sendChatMessage(gameid, content, socket) {
-        this.getGameFromID(gameid).sendChatMessage(content, socket);
-    }
 }
 class Client {
     constructor(_socket, _nickname, _gameid) {
@@ -65,7 +60,14 @@ class Client {
         this.gameid = _gameid; // stores game id the client is in
         this.nickname = _nickname;
         this.score = 0;
+		this.isHost = false;
     }
+	promoteToHost() {
+		this.isHost = true;
+	}
+	isHost() {
+		return this.isHost;
+	}
 }
 class ClientManager {
     constructor() {
@@ -90,28 +92,34 @@ class Game {
         console.log("New game " + _id + " created!");
         this.clients = [];
         this.id = _id;
-		this.gameBoard = new GameBoard();
+		this.gameBoard = null;
     }
-    /* Randomly chooses the first player to draw */
-    pickStartingPlayer() {
-        //this.drawing = this.clients[Math.floor(Math.random()*this.clients.length)].nickname;
-        this.drawing = this.clients[0].nickname;
-    }
+	updateGameBoard(board) {
+		this.gameBoard = board;
+		this.clients.forEach(function(index) {
+            index.socketObject.emit('game_board', board);
+        });
+	}
     /* puts a client into the game. takes a Client object for the parameter */
     joinGame(_client) {
+		if (this.clients.length == 0) {
+			// first player, make them host
+			_client.promoteToHost();
+			console.log("Client " + _client.nickname + " made host!");
+		}
         this.clients.push(_client);
         clientmanager.addClient(_client);
         console.log("Player " + _client.nickname + " joined! Number of connnected clients: " + this.clients.length);
 
         this.sendPlayerList();
-		this.sendGameBoard();
+		//this.sendGameBoard();
         // send board
     }
     leaveGame(_client) {
         if (_client.nickname == this.drawing) {
-            // oh no! the drawing player left! Handle this appropriately. (Clear board, restart round, pick new drawing);
-        }
+            // oh no! the drawing player left! Handle this appropriately. (Clear board, restart round, pick new draw
         this.clients.remove(_client);
+        }
         clientmanager.removeClient(_client);
         console.log("Player " + _client.nickname + " left! Number of connected clients: " + this.clients.length);
         if (this.clients.length == 0) {
@@ -120,19 +128,7 @@ class Game {
         }
         this.sendPlayerList();
     }
-
-    // takes String and socket.id (string)
-    sendChatMessage(content, socket) {
-        this.clients.forEach(function(index) {
-            if (socket == "SERVER") {
-                index.socketObject.emit('chat', content, "SERVER");
-            } else {
-                index.socketObject.emit('chat', content, clientmanager.getClientFromSocket(socket.id).nickname);
-            }
-        });
-    }
     sendPlayerList() { // called whenever a player disconnects/joins
-        console.log("sendPlayerList() called!");
         var names = [];
         this.clients.forEach(function(index) {
             names.push(index.nickname);
@@ -141,11 +137,11 @@ class Game {
             index.socketObject.emit('plist', names);
         });
     }
-    sendGameBoard() {
-        this.clients.forEach(function(index) {
-            index.socketObject.emit('game_board', "TODO: SEND GAME BOARD");
+	updateBoard(state, x, y, op) {
+		this.clients.forEach(function(index) {
+				index.socketObject.emit('board_update', state, x, y, op);
         });
-    }
+	}
 }
 Array.prototype.remove = function(object) {
     var index = this.indexOf(object);

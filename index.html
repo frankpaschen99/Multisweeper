@@ -2,9 +2,15 @@
 <script>
 	var socket = io('http://98.221.72.60:7865');
 	
-	socket.on('game_board', function(content, user) {
-		<!-- draw game board using info sent from server -->
-	});
+	
+	
+	// updated on client, send to server
+	function sendBoardData(data, op) {	
+		// called when tile is clicked or flagged. Send this data to server.
+		
+		socket.emit("adadadada", data.getState(), data.getX(), data.getY(), op);
+	}
+	
 	
 	socket.on('plist', function(players) {
 		document.getElementById("playerlist").innerHTML = "";
@@ -12,7 +18,7 @@
 			document.getElementById("playerlist").innerHTML += index + "<br />";
 		});
 	});
-
+	
 	function joinGame() {
 		// "join" function takes a lobby code and a username.
 		var lobbyCode = document.getElementById('lobbyCode').value;
@@ -20,10 +26,18 @@
 		document.getElementById("start").innerHTML = "";
 		document.getElementById("lobbyID").innerHTML = lobbyCode;
 	}
+
 </script>
 
 <head>
 <script src="libs/jquery-3.2.1.min.js"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="libs/phaser.min.js"></script>
+        <script src="game/game.js"></script>    
+        <script src="game/tile.js"></script>
+        <script src="game/board.js"></script>
+        <script src="game/counter.js"></script>
 </head>
 <body>
 	<div id="start">
@@ -38,7 +52,7 @@
 	function mcBlocks() {
 		setInterval(function(){
 			document.getElementById("start").appendChild(new Image()).src = "img/grass.png";
-		}, 1500);
+		}, 10000);
 	}
 	mcBlocks();
 	</script>
@@ -51,335 +65,6 @@
 	
 	<p>The game will be displayed here </p>
 	
-	<!--<div id="gameboard">
-		<script>
-		$(document).ready(function() {
-			var body = $("body");
-			
-			{ //BODY
-				{ //HTML
-					body.append(
-						"<style>" +
-							"table#minefield td {" +
-								"text-align: center;" +
-								"font-weight: bold;" +
-							"}" +
-							".flag {" +
-								"background-color: grey;" +
-							"}" +
-							".mine {" +
-								"background-color: red;" +
-							"}" +
-							".gomine {" +
-								"background-color: orange;" +
-							"}" +
-							".class0, .class1, .class2, .class3, .class4, .class5, .class6, .class7, .class8 {" +
-								"background-color: #EEE;" +
-							"}" +
-							".class1 {" +
-								"color: blue;" +
-							"}" +
-							".class2 {" +
-								"color: green;" +
-							"}" +
-							".class3 {" +
-								"color: red;" +
-							"}" +
-							".class4 {" +
-								"color: purple;" +
-							"}" +
-							".class5 {" +
-								"color: maroon;" +
-							"}" +
-							".class6 {" +
-								"color: deepskyblue;" +
-							"}" +
-							".class7 {" +
-								"color: black;" +
-							"}" +
-							".class8 {" +
-								"color: gray;" +
-							"}" +
-						"</style>"
-						);
-					
-						
-					//TEST INPUTS
-						var size = $("input#size");
-						var mines = $("input#mines");
-						var hints = $("input#hints");
-						
-						var sizeRegex = /^([1-9][0-9]*)x([1-9][0-9]*)$/;
-						var minesRegex = /^[1-9][0-9]*$/;
-						var hintsRegex = /^[0-9]+$/;
-						
-						var width = 30;
-						var height = 16;
-						
-						if (parseInt(mines.val()) >= width * height) {
-							alert("The amount of mines is too damn high!");
-						} else if (parseInt(hints.val()) >= width * height) {
-							alert("The amount of hints is too damn high!");
-						} else {
-							//Seems like derp filled in correctly
-							
-							var playField = new Array();
-							for (var h = 0; h < height; h++) {
-								var row = new Array();
-								for (var w = 0; w < width; w++) {
-									row.push(new Array(0,0,0));
-								}
-								playField.push(row);
-							}
-							
-							var minesCount = 99;
-							for (var i = 0; i < minesCount; i++) {
-								var available = false;
-								var randW = 0;
-								var randH = 0;
-								do {
-									randW = parseInt(Math.random() * (width-1));
-									randH = parseInt(Math.random() * (height-1));
-									
-									available = playField[randH][randW][0] == 0;
-								} while (!available);
-								playField[randH][randW][0] = -1;
-							}
-							
-							for (var h = 0; h < height; h++) {
-								for (var w = 0; w < width; w++) {
-									if (playField[h][w][0] == 0) {
-										var touchingMines = 0;
-										if (h-1 >= 0 && w-1 >= 0) {
-											if (playField[h-1][w-1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (h-1 >= 0) {
-											if (playField[h-1][w][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (h-1 >= 0 && w+1 < width) {
-											if (playField[h-1][w+1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (w-1 >= 0) {
-											if (playField[h][w-1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (w+1 < width) {
-											if (playField[h][w+1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (h+1 < height && w-1 >= 0) {
-											if (playField[h+1][w-1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (h+1 < height) {
-											if (playField[h+1][w][0] == -1) {
-												touchingMines++;
-											}
-										}
-										if (h+1 < height && w+1 < width) {
-											if (playField[h+1][w+1][0] == -1) {
-												touchingMines++;
-											}
-										}
-										playField[h][w][0] = touchingMines;
-									}
-								}
-							}
-							
-							var minefield = $("table#minefield").remove();
-							$("h1#gameOver").remove();
-							$("h1#minesLeft").remove();
-							
-							
-							var hintsLeft = parseInt(hints.val());
-							var hinting = false;
-							
-							{ //TABLE
-								{ //HTML
-								
-									var minefieldHtml = "";
-								
-									minefieldHtml += "<table id=\"minefield\">";
-									for (var h = 0; h < height; h++) {
-										minefieldHtml += "<tr>";
-										for (var w = 0; w < width; w++) {
-											minefieldHtml += "<td x=\"" + w + "\" y=\"" + h + "\"></td>";
-										}
-										minefieldHtml += "</tr>";
-									}
-									minefieldHtml += "</table>";
-									
-									body.append(minefieldHtml);
-									
-									minefield = $("table#minefield");
-
-								}
-								{ //STYLE
-									minefield.css("border-collapse","collapse")
-									minefield.find("td").css("border","1px solid black").width("20px").height("20px");
-								}
-								{ //ACTIONS
-									var gameOver = false;
-									var minesLeft = minesCount;
-									
-									minefield.find("td").on('contextmenu',function(e) {
-										e.preventDefault();
-									}).on('mousedown',function(e) {
-										var x = parseInt($(this).attr("x"));
-										var y = parseInt($(this).attr("y"));
-										var cell = $('td[x="' + (x) + '"][y="' + (y) + '"]');
-										var cellValue = playField[y][x][0];
-										
-										var cellOpen = playField[y][x][1];
-										if (cellOpen == 1 || gameOver == 1) {
-											return;
-										}
-										
-										var height = playField.length;
-										var width = playField[0].length;
-										
-										var checkWon = function() {
-											if (minesLeft == 0 && !gameOver) {
-												var won = true;
-												for (var h = 0; h < height; h++) {
-													if (!won) {
-														break;
-													}
-													for (var w = 0; w < width; w++) {
-														var testCellValue = playField[h][w][0];
-														var testCell = $('td[x="' + (w) + '"][y="' + (h) + '"]');
-														if ((testCell.hasClass("flag") && testCellValue != -1) || (!testCell.hasClass("flag") && testCellValue == -1)) {
-															won = false;
-															break;
-														}
-													}
-												}
-												if (won) {
-													body.append("<h1 id='gameOver'>You won!</h1>");
-													gameOver = true;
-												}
-											}
-
-										}
-										
-										if (hinting && !gameOver) {
-											hintsLeft--;
-											hinting = false;
-											if (cellValue == -1) {
-												cell.addClass("flag");
-												minesLeft--;
-											} else {
-												cell.mousedown();
-											}
-											checkWon();
-											return;
-										}
-										
-										switch (e.which) {
-											case 1: case undefined: //LEFT-CLICK
-												{
-													if (cell.hasClass("flag")) {
-														return;
-													}
-													if (cellValue == -1) {
-														cell.addClass("mine");
-														body.append("<h1 id='gameOver'>Game Over</h1>");
-														for (var h = 0; h < height; h++) {
-															for (var w = 0; w < width; w++) {
-																if (playField[h][w][0] == -1) {
-																	var goCell = $('td[x="' + (w) + '"][y="' + (h) + '"]');
-																	if (!goCell.hasClass("mine")) {
-																		goCell.addClass("gomine");
-																	}
-																}
-															}
-														}
-														gameOver = true;
-														return;
-													}
-
-													cell.addClass("class" + cellValue);
-													
-													playField[y][x][1] = 1;
-													
-													if (cellValue == 0) {
-														if (y-1 >= 0 && x-1 >= 0) {
-															$('td[x="' + (x-1) + '"][y="' + (y-1) + '"]').mousedown();
-														}
-														if (y-1 >= 0) {
-															$('td[x="' + (x) + '"][y="' + (y-1) + '"]').mousedown();
-														}
-														if (y-1 >= 0 && x+1 < width) {
-															$('td[x="' + (x+1) + '"][y="' + (y-1) + '"]').mousedown();
-														}
-														if (x-1 >= 0) {
-															$('td[x="' + (x-1) + '"][y="' + (y) + '"]').mousedown();
-														}
-														if (x+1 < width) {
-															$('td[x="' + (x+1) + '"][y="' + (y) + '"]').mousedown();
-														}
-														if (y+1 < height && x-1 >= 0) {
-															$('td[x="' + (x-1) + '"][y="' + (y+1) + '"]').mousedown();
-														}
-														if (y+1 < height) {
-															$('td[x="' + (x) + '"][y="' + (y+1) + '"]').mousedown();
-														}
-														if (y+1 < height && x+1 < width) {
-															$('td[x="' + (x+1) + '"][y="' + (y+1) + '"]').mousedown();
-														}
-													} else {
-														cell.html(cellValue);
-													}
-												}
-												break;
-											case 3: //RIGHT-CLICK
-												{
-													if (cell.hasClass('flag')) {
-														cell.removeClass('flag');
-														minesLeft++;
-													} else {
-														cell.addClass('flag');
-														minesLeft--;
-													}
-
-													$("h1#minesLeft").remove();
-													minefield.after("<h1 id='minesLeft'>Mines left: " + minesLeft + "</h1>");
-												}
-												break;
-											default:
-												alert("You weirdo!");
-												break;
-										}
-										checkWon();
-									});
-								}
-							}
-						}
-				}
-				{ //STYLE
-					body.css("font-family","sans-serif");
-				}
-			}
-			
-			{ //ACTIONS
-				$("form").submit(function(e) {
-					e.preventDefault();
-
-					{ 
-					}
-				});
-			}
-		});
-	</script>
-	</div> -->
+	<div id="gameDiv"> </div>
 	
 </body>
