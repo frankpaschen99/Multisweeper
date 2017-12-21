@@ -8,6 +8,8 @@ made by frank for programming class
 
 ## TODO
 * Get all players starting with the same board
+* Mine counter
+* Timer
 
 ## Tech
 * Node.js: Game server
