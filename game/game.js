@@ -53,7 +53,7 @@ gameState.prototype = {
 		game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
 		console.log("create() called");
     },
-
+	
     update: function () {
     },
     

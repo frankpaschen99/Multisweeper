@@ -29,7 +29,7 @@ var Tile = function (column, row, group) {
     var currentState = this.states.DEFAULT;
     
     var sprite = game.add.sprite(this.x, this.y, graphicAssets.tiles.name, currentState, group);
-    
+	
     var init = function () {
         sprite.inputEnabled = true;
         sprite.input.useHandCursor = true;

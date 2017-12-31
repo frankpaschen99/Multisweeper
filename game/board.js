@@ -25,48 +25,28 @@ var Board = function (columns, rows, mines) {
         }  
         
         setMines();
-		
-		/* Sent original board to server for other clients to download */		
-		var initBoard = [];
-		
-		for (var y = 0; y < rows; y++) {
-			
-			var row = [];
-			
-			for (var x = 0; x < columns; x++) {
-				var data = [];
-				data.push(board[y][x].getX());
-				data.push(board[y][x].getY());
-				data.push(board[y][x].getState());
-				row.push(data);
-			}
-			initBoard.push(row);
-		}
-		socket.emit("init_board", initBoard);
-		/* FIX ALL OF THIS OH MY GOD */
-		socket.on('init_board_start', function(data) {
-			board = null;
-			console.log("init board start called");
-			
-			for (var y = 0; y < rows; y++) {
-				var row = [];			
-				for (var x = 0; x < columns; x++) {
 
-					var tile = new Tile(x, y, group);
-					tile.setX(data[y][x].getX());
-					tile.setY(data[y][x].getY());
-					tile.setState(data[y][x].getState())
-					
-					tile.onRevealed.add(onReveal, this);
-					tile.onFlag.add(onFlag, this);
-					row.push(tile);
+		socket.on("init_board_start", function(data) {
+			/*console.log("board data: " + data);
+			var count = 0;
+			
+			var curY = 0;
+			var curX = 0;
+			
+			//for (var i = 0; i < data.length; i++) {
+				board[0][0] = data[i];
+				if (curX == 31) {
+					curY++;
+					curX = 0;
 				}
-				board.push(row);
-		}
+			}*/
+			console.log("init_board_start triggered");
+			board[0][0] = data[0];
 		});
-		/* Board data sent from server, update board on client */
+		
+		// this works. dont touch it
 		socket.on('board_update', function(state, x, y, op) {
-			console.log("Recieved data back! " + state + ", " + x + "," + y);
+			//console.log("Recieved data back! " + state + ", " + x + "," + y);
 			if (op == -1)
 				board[y/32][x/32].flag();
 			else if (op == 1)
@@ -80,7 +60,17 @@ var Board = function (columns, rows, mines) {
         group.x = x;
         group.y = y;
     };
-    
+    var sendInitBoard = function() {
+		var initBoard = [];
+		for (var y = 0; y < rows; y++) {
+			for (var x = 0; x < columns; x++) {
+				initBoard.push(board[y][x].getValue());
+				//initBoard[y][x] = board[y][x].getValue();
+			}
+		}
+		socket.emit("init_board", initBoard);
+		console.log(initBoard);
+	};
     var getRandomTile = function () {
         var randomRow = Math.floor(Math.random() * rows);
         var randomColumn = Math.floor(Math.random() * columns);
@@ -101,6 +91,7 @@ var Board = function (columns, rows, mines) {
             updateSurroundingTiles(tile);
             tile = getRandomTile();
         }
+		sendInitBoard();
     };
     
     var updateSurroundingTiles = function (tile) {
@@ -115,7 +106,7 @@ var Board = function (columns, rows, mines) {
             }
 
             targetTile.setValue(targetTile.getValue() + 1);
-        }
+        }		
     }
     
     var getSurroundingTiles = function (tile) {

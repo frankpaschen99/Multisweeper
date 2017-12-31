@@ -25,10 +25,11 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('init_board', function(board) {
+		// console.log(board);
 		// host will send this to the server
 		if (clientmanager.getClientFromSocket(socket.id).isHost) {
 			// dont accept anything from non-hosts
-			//console.log(board);
+			console.log("called");
 			manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).setBoard(board);
 		}
 		
@@ -126,8 +127,6 @@ class Game {
 
         this.sendPlayerList();
 		this.sendBoard();
-		//this.sendGameBoard();
-        // send board
     }
     leaveGame(_client) {
         if (_client.nickname == this.drawing) {
@@ -153,13 +152,15 @@ class Game {
     }
 	setBoard(_board) {
 		if (this.board == null) {
+			console.log("Setting board!");
+			console.log(_board);
 			this.board = _board;
 		}
 	}
 	sendBoard() {
 		this.clients.forEach(function(index) {
 			if (!index.isHost)	// if not the host, send the inital game board 
-				index.socketObject.emit('init_board_start', this.gameBoard);
+				index.socketObject.emit('init_board_start', this.board);
 			console.log("game board sent");
         }.bind(this));
 	}
