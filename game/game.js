@@ -23,22 +23,28 @@ var fontStyles = {
     counterFontStyle: {font: '20px Arial', fill: '#FFFFFF'}
 };
 
+var board;
+
 var gameState = function(game){
     this.boardTop;
     this.boardLeft;
-    this.board;
+    //this.board;
     this.timer;
     this.counter;
     this.tf_replay;
 };
 
+var getBoard = function() {
+	return board;
+};
+
 gameState.prototype = {
-    
     init: function () {
         // center game board relative to game world
         this.boardTop = (gameProperties.screenHeight - (gameProperties.tileHeight * gameProperties.boardHeight)) * 0.5;
         this.boardLeft = (gameProperties.screenWidth - (gameProperties.tileWidth * gameProperties.boardWidth)) * 0.5; 
 		console.log("init() called");
+		
 	},
     
     preload: function () {
@@ -52,6 +58,10 @@ gameState.prototype = {
         this.initUI();
 		game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
 		console.log("create() called");
+		
+		// hey! we can access the gameboard here
+		console.log(board.getBoard()[0][0].getValue());
+	
     },
 	
     update: function () {
@@ -59,18 +69,21 @@ gameState.prototype = {
     
     initBoard: function () {
 		
-		this.board = new Board(gameProperties.boardWidth, gameProperties.boardHeight, gameProperties.totalMines);
+		board = new Board(gameProperties.boardWidth, gameProperties.boardHeight, gameProperties.totalMines);
 		
         // move board to center of screen
-        this.board.moveTo(this.boardLeft, this.boardTop);
+        board.moveTo(this.boardLeft, this.boardTop);
         
         // listeners for onTileClicked and onEndGame
-        this.board.onTileClicked.addOnce(this.startGame, this);
-        this.board.onEndGame.addOnce(this.endGame, this);
-        this.board.onTileFlagged.add(this.updateMines, this);
+        board.onTileClicked.addOnce(this.startGame, this);
+        board.onEndGame.addOnce(this.endGame, this);
+        board.onTileFlagged.add(this.updateMines, this);
 		
 		console.log("initBoard() called");
 		
+		// send request for board
+		
+		socket.emit("request_init_board");
     },
     
     initUI: function () {

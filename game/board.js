@@ -22,27 +22,9 @@ var Board = function (columns, rows, mines) {
             }
             
             board.push(row);
-        }  
+        }
         
         setMines();
-
-		socket.on("init_board_start", function(data) {
-			/*console.log("board data: " + data);
-			var count = 0;
-			
-			var curY = 0;
-			var curX = 0;
-			
-			//for (var i = 0; i < data.length; i++) {
-				board[0][0] = data[i];
-				if (curX == 31) {
-					curY++;
-					curX = 0;
-				}
-			}*/
-			console.log("init_board_start triggered");
-			board[0][0] = data[0];
-		});
 		
 		// this works. dont touch it
 		socket.on('board_update', function(state, x, y, op) {
@@ -52,6 +34,7 @@ var Board = function (columns, rows, mines) {
 			else if (op == 1)
 				board[y/32][x/32].reveal();
 		});
+		
     };
     this.getBoard = function() {
 		return board;
@@ -61,15 +44,23 @@ var Board = function (columns, rows, mines) {
         group.y = y;
     };
     var sendInitBoard = function() {
-		var initBoard = [];
+		// send the initial board to the server (will only accept from the host)
+		console.log("sendInitBoard() called");
+		var initBoard = new Array();
+		
+		var xCount = 0;
 		for (var y = 0; y < rows; y++) {
-			for (var x = 0; x < columns; x++) {
-				initBoard.push(board[y][x].getValue());
-				//initBoard[y][x] = board[y][x].getValue();
+			initBoard[y] = new Array();
+			
+			//console.log(board[y][xCount].getValue());
+			
+			while (xCount < 32) {
+				initBoard[y].push(board[y][xCount].getValue());
+				xCount++;
 			}
+			xCount = 0;
 		}
 		socket.emit("init_board", initBoard);
-		console.log(initBoard);
 	};
     var getRandomTile = function () {
         var randomRow = Math.floor(Math.random() * rows);
@@ -194,12 +185,12 @@ var Board = function (columns, rows, mines) {
     
     var revealAll = function () {
         self.onEndGame.dispatch();
-        
+
         for (var y = 0; y < rows; y++) {
             for (var x = 0; x < columns; x++) {
                 var tile = board[y][x];
-                
-                if (tile.isRevealed()) {
+				
+                if (tile.isRevealed() || tile.getState() == 10) {
                     continue;
                 }
                 

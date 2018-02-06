@@ -1,17 +1,19 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
-	var socket = io('http://98.221.72.60:7865');
-	
-	
+	var socket = io('localhost:7865');
 	
 	// updated on client, send to server
 	function sendBoardData(data, op) {	
 		// called when tile is clicked or flagged. Send this data to server.
-		
 		socket.emit("bdata", data.getState(), data.getX(), data.getY(), op);
 	}
 	
+	// this is sent by the server when the host starts a game
+	socket.on('ident_host', function() {
+		document.getElementById("lobbyID").innerHTML += "<br/><b>            You are hosting this session! congratz idiot</b>";
+	});
 	
+
 	socket.on('plist', function(players) {
 		document.getElementById("playerlist").innerHTML = "";
 		players.forEach(function(index) {
@@ -22,12 +24,15 @@
 	function joinGame() {
 		// "join" function takes a lobby code and a username.
 		var lobbyCode = document.getElementById('lobbyCode').value;
-		socket.emit("join_game", lobbyCode, document.getElementById('username').value);
-		document.getElementById("start").innerHTML = "";
-		document.getElementById("lobbyID").innerHTML = lobbyCode;
-		game.state.start(states.game);
-	}
 
+		game.state.start(states.game);
+
+		socket.emit("join_game", lobbyCode, document.getElementById('username').value);
+		
+		document.getElementById("start").innerHTML = "";
+		document.getElementById("start").innerHTML = "Socket ID: (debug): " + socket.id;
+		document.getElementById("lobbyID").innerHTML = lobbyCode;
+	}
 </script>
 
 <head>
@@ -39,7 +44,34 @@
         <script src="game/tile.js"></script>
         <script src="game/board.js"></script>
         <script src="game/counter.js"></script>
+		
+		<script>
+		// figure out how to get this called last
+		socket.on("boardstart", function(data) {
+			// TODO: this isnt being called. figure out why not - possibly to do with the player joining the server & being added to the game\
+			try {
+				console.log(data);
+				//getBoard().getBoard()[0][0].setValue(data[0][0]);
+
+				var xCount = 0;
+				for (var y = 0; y < 24; y++) {
+					while (xCount < 32) {
+						getBoard().getBoard()[y][xCount].setValue(data[y][xCount]);
+						xCount++;
+					}
+					xCount = 0;
+				}
+				
+			} catch(e) {
+			}
+			
+			console.log("boardstart triggered");
+			
+			
+		});
+	</script>
 </head>
+
 <body>
 	<div id="start">
 	<h1>Welcome to Multisweepercraft V1.0 by Frank!!!!111</h1>
@@ -56,10 +88,10 @@
 	<script>
 	function mcBlocks() {
 		setInterval(function(){
-			document.getElementById("start").appendChild(new Image()).src = "img/grass.png";
-		}, 10000);
+			document.getElementById("blocks").appendChild(new Image()).src = "img/grass.png";
+		}, 1000);
 	}
-	//mcBlocks();
+	mcBlocks();
 	</script>
 	<br><br>
 	<hr><hr><hr>
@@ -71,5 +103,6 @@
 	<p>The game will be displayed here </p>
 	
 	<div id="gameDiv"> </div>
+	<div id="blocks"></div>
 	
 </body>
