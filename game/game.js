@@ -58,10 +58,6 @@ gameState.prototype = {
         this.initUI();
 		game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
 		console.log("create() called");
-		
-		// hey! we can access the gameboard here
-		console.log(board.getBoard()[0][0].getValue());
-	
     },
 	
     update: function () {
@@ -76,13 +72,12 @@ gameState.prototype = {
         
         // listeners for onTileClicked and onEndGame
         board.onTileClicked.addOnce(this.startGame, this);
-        board.onEndGame.addOnce(this.endGame, this);
         board.onTileFlagged.add(this.updateMines, this);
+        board.onEndGame.addOnce(this.endGame, this);
 		
 		console.log("initBoard() called");
 		
-		// send request for board
-		
+		// send request for board here so the board object gets initialized before we start fucking with it
 		socket.emit("request_init_board");
     },
     

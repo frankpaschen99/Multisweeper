@@ -17,6 +17,9 @@ io.on('connection', function(socket) {
 			console.log("Don't click the board please.");
 		}
 	});
+	socket.on('trigger_restart', function() {
+		manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).restartGame();
+	});
 	socket.on('request_init_board', function() {
 		manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).sendBoard();
 	});
@@ -46,7 +49,7 @@ class Game {
     /* puts a client into the game. takes a Client object for the parameter */
     joinGame(_client) {
 		if (this.clients.length == 0) {
-			//_client.socketObject.emit('ident_host');
+			_client.socketObject.emit('ident_host');
 			console.log("Client " + _client.nickname + " made host!");
 		}
         this.clients.push(_client);
@@ -56,6 +59,12 @@ class Game {
         this.sendPlayerList();
 		this.sendBoard();
     }
+	restartGame() {
+		this.clients.forEach(function(index) {
+            index.socketObject.emit('restart');
+        });
+		this.sendBoard();
+	}
     leaveGame(_client) {
         this.clients.remove(_client);
         clientmanager.removeClient(_client);

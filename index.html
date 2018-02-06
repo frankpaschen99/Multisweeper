@@ -1,6 +1,6 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
-	var socket = io('localhost:7865');
+	var socket = io('98.221.72.60:7865');
 	
 	// updated on client, send to server
 	function sendBoardData(data, op) {	
@@ -20,6 +20,21 @@
 			document.getElementById("playerlist").innerHTML += index + "<br />";
 		});
 	});
+	
+	/*socket.on('restart', function() {
+		game.state.start(states.game);
+	});
+	
+	// only the host should trigger this. im not putting in safeguards though
+	function restartGame() {
+		// empty lobby and have all players rejoin
+		
+		game.state.start(states.game);
+		
+		// tell the server we want to restart. server will call 'restart' for everyone
+		socket.emit('trigger_restart');
+		
+	}*/
 	
 	function joinGame() {
 		// "join" function takes a lobby code and a username.
@@ -74,7 +89,7 @@
 
 <body>
 	<div id="start">
-	<h1>Welcome to Multisweepercraft V1.0 by Frank!!!!111</h1>
+	<h1>Welcome to Multisweepercraft Beta version 1.0 by Frank!!!!111</h1>
 	<h3>To play, enter your username & lobby code (optional). Then click Join Game.</h3>
 
 	<input text="text" id="username" placeholder="Username">
@@ -101,8 +116,19 @@
 	<div id="playerlist"></div>
 	
 	<p>The game will be displayed here </p>
-	
+	<button type="button" onclick=" ">Restart Game (broken - fixing 2/7/18)</button>
 	<div id="gameDiv"> </div>
-	<div id="blocks"></div>
-	
+	<p>Game Timer: (1 block = 1 second)</p>
+	<div id="blocks"></div>	
+	<div id="todo">
+	<h2>To-Do List for version 2:</h2>
+		<ul>
+		  <li>Generate the board after the first click</li>
+		  <li>Allow players to hold left click without clicking a tile</li>
+		  <li>Add more minecraft blocks</li>
+		  <li>Restart game button</li>
+		  <li>Mine counter</li>
+		  <li>Allow players to drop in late - tile states are not sent over network</li>
+		</ul>
+	</div>
 </body>
