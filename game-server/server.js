@@ -27,6 +27,7 @@ io.on('connection', function(socket) {
 	//  Recieve the initial board from the host. Will not accept from non-hosts
 	socket.on('init_board', function(board) {
 		if (clientmanager.getClientFromSocket(socket.id).isHost) {
+			console.log("recieved board from host");
 			manager.getGameFromID(clientmanager.getClientFromSocket(socket.id).gameid).setBoard(board);
 		}
 	});
@@ -60,8 +61,11 @@ class Game {
 		this.sendBoard();
     }
 	restartGame() {
+		console.log("restartGame() called");
 		this.clients.forEach(function(index) {
-            index.socketObject.emit('restart');
+			if (!index.isHost) {
+				index.socketObject.emit('restart');
+			}
         });
 		this.sendBoard();
 	}
@@ -86,9 +90,9 @@ class Game {
     }
 	// Set the board recieved from the host
 	setBoard(_board) {
-		if (this.board == null) {	// failsafe to ensure only hosts can set the board
+	//	if (this.board == null) {	// failsafe to ensure only hosts can set the board
 			this.board = _board;
-		}
+	//	}
 	}
 	// send initial board to non-hosts when they join
 	sendBoard() {

@@ -52,8 +52,6 @@ var Board = function (columns, rows, mines) {
 		for (var y = 0; y < rows; y++) {
 			initBoard[y] = new Array();
 			
-			//console.log(board[y][xCount].getValue());
-			
 			while (xCount < 32) {
 				initBoard[y].push(board[y][xCount].getValue());
 				xCount++;

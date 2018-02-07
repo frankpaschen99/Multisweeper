@@ -70,7 +70,6 @@ var Tile = function (column, row, group) {
         sprite.inputEnabled = false;
         this.onRevealed.dispatch(tile); // send a signal whenever a tile is revealed
     };
-    
     this.flag = function () {
         if (currentState == tile.states.DEFAULT) {
             currentState = tile.states.FLAG;
