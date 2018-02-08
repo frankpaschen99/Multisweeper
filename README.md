@@ -1,14 +1,6 @@
 # Multisweepercraft
 
-made by frank for programming class
+literally just multiplayer minesweeper... made to alleviate boredom in programming class
 
-[View progress live here](http://98.221.72.60:80/Multisweepercraft)
-
-
-
-## TODO
-* see live site
-## Tech
-* Node.js: Game server
-* Socket.io: Networking
-* Phaser.io: Game
+to use, make sure you have socket.io installed and run the node server... launch the site on an apache server and yer good to go
+make sure you change the ip to localhost or whatever in index.html
