@@ -6,8 +6,6 @@ to use, make sure you have socket.io installed and run the node server... launch
 
 make sure you change the ip to localhost or whatever in index.html
 
-~~Click here to play!
-
 # Known Issues:
 - Browsers of all clients will freeze for no reason sometimes when restarting the game (rare)
 - Players cannot join the game late because tile states are not sent to them when they join
